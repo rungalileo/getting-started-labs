@@ -135,7 +135,7 @@ saved_dataset = get_dataset(name=DATASET_NAME)
 
 results = run_experiment(
     "support-qa-experiment-v1",
-    project=os.environ["GALILEO_PROJECT"],
+    project=project,
     dataset=saved_dataset,  # use the saved, versioned dataset
     function=support_assistant,
     metrics=[
