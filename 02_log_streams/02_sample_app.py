@@ -19,14 +19,19 @@ import os
 import json
 from dotenv import load_dotenv
 from galileo import log, galileo_context
-from galileo.openai import OpenAI
+from galileo.openai import openai
 
 
 load_dotenv("../.env")
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+#client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
+
 
 # Confirm that environment variables are properly mapped
 print(f"Loaded env variables: galileo console: {os.environ.get("GALILEO_CONSOLE_URL")} | Project: {project} | Log Stream: {log_stream}")
@@ -139,7 +144,7 @@ def run_agent(user_query: str):
         print(f"\n[Step {step + 1}] Calling LLM...")
 
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=os.environ.get("OPENAI_MODEL_NAME"),
             messages=messages,
             tools=TOOLS,
             tool_choice="auto",

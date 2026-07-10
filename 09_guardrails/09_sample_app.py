@@ -52,6 +52,7 @@ from openai import OpenAI
 
 # Confirm that environment variables are properly mapped
 print(f"Loaded env variables: galileo console: {os.environ.get('GALILEO_CONSOLE_URL')} | Project: {project} | Log Stream: {log_stream}")
+print(f"Loaded env variables: galileo console: {AGENT_NAME} | Project: {project} | Log Stream: {log_stream}")
 
 
 # --------------------------------------------------------------------------------------
@@ -219,8 +220,11 @@ def get_log_stream_id():
 # --------------------------------------------------------------------------------------
 # Initialize OpenAI client
 # --------------------------------------------------------------------------------------
-client = OpenAI(api_key=OPENAI_API_KEY)
-
+#client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
 
 # --------------------------------------------------------------------------------------
 # Tools
@@ -234,7 +238,7 @@ def get_llm_response(input: str) -> str:
         {"role": "user", "content": input},
     ]
 
-    response = client.chat.completions.create(model="gpt-4o-mini", messages=messages)
+    response = client.chat.completions.create(model=os.environ.get("OPENAI_MODEL_NAME"), messages=messages)
     return response
 
 
@@ -275,7 +279,6 @@ def _get_transactions(sql: str) -> str:
 _get_transactions.name = "get_transactions"
 _get_transactions.tool_name = "get_transactions"
 _get_transactions_controlled = control(step_name="get_transactions")(_get_transactions)
-
 
 
 tools = [
@@ -357,7 +360,7 @@ def run_agent(test_query: list):
                 logger.add_llm_span(
                     input=messages,
                     output=response,
-                    model="gpt-4o-mini",
+                    model=os.environ.get("OPENAI_MODEL_NAME"),
                     name=get_llm_response.__name__,
                     num_input_tokens=input_tokens,
                     num_output_tokens=output_tokens,
@@ -376,7 +379,7 @@ def run_agent(test_query: list):
                 return
 
         for attempt in range(3):  # Allow up to 3 attempts for steer self-correction
-            response = client.chat.completions.create(model="gpt-4o-mini", tools=tools, messages=messages)
+            response = client.chat.completions.create(model=os.environ.get("OPENAI_MODEL_NAME"), tools=tools, messages=messages)
             msg = response.choices[0].message
 
             if not msg.tool_calls:

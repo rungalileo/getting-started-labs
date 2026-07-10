@@ -40,7 +40,7 @@ from galileo import GalileoLogger, galileo_context, log
 from openai import OpenAI
 
 load_dotenv("../.env")
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
 # Confirm that environment variables are properly mapped
@@ -71,7 +71,11 @@ galileo_context.init(project=project, log_stream=log_stream)
 # ---------------------------------------------------------------------------
 # LLM client — Galileo wrapper automatically traces all calls
 # ---------------------------------------------------------------------------
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+#client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
 
 logger = GalileoLogger(project=project, log_stream=log_stream)
 
@@ -178,7 +182,7 @@ for conv in conversations:
         messages.append({"role": "user", "content": user_message})
 
         llm_response = client.chat.completions.create(
-            model="gpt-5.2",
+            model=os.environ.get("OPENAI_MODEL_NAME"),
             temperature=0.3,
             messages=messages,
             max_completion_tokens=300
@@ -194,7 +198,7 @@ for conv in conversations:
         logger.add_llm_span(
             input=messages,
             output=response,
-            model="gpt-5.2",
+            model=os.environ.get("OPENAI_MODEL_NAME"),
             name="Response Generation",
             num_input_tokens=input_tokens,
             num_output_tokens=output_tokens,

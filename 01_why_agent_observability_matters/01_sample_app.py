@@ -23,7 +23,7 @@ from galileo.openai import openai
 from galileo import galileo_context
 
 load_dotenv("../.env")
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
 # Confirm that environment variables are properly mapped
@@ -31,13 +31,17 @@ print(f"Loaded env variables: galileo console: {os.environ.get("GALILEO_CONSOLE_
 
 # Galileo wraps the OpenAI client automatically.
 # Traces are sent to the project and log stream set in your .env file.
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+#client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
 
 def ask(question: str) -> str:
     """Send a question to the model and return the response."""
     response = client.chat.completions.create(
-        model="gpt-5.2",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": question},

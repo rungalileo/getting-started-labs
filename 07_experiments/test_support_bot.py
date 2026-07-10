@@ -6,14 +6,19 @@ from galileo.schema.metrics import GalileoMetrics
 from galileo.experiments import run_experiment, get_experiment
 
 load_dotenv("../.env")
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
 # Confirm that environment variables are properly mapped
 print(f"Loaded env variables: galileo console: {os.environ.get("GALILEO_CONSOLE_URL")} | Project: {project} | Log Stream: {log_stream}")
 
 
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+#client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
+
 
 # ── Mock knowledge base (simulates a vector store retrieval) ──────────────────
 
@@ -63,7 +68,7 @@ def generate_answer(question: str, context: str) -> str:
         else f"Question: {question}"
     )
     response = client.chat.completions.create(
-        model="gpt-5.2",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_message},

@@ -33,7 +33,11 @@ log_stream=os.environ.get("GALILEO_LOG_STREAM")
 print(f"Loaded env variables: galileo console: {os.environ.get("GALILEO_CONSOLE_URL")} | Project: {project} | Log Stream: {log_stream}")
 
 
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+#client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
 
 # ---------------------------------------------------------------------------
 # Mock retriever — behaves like a real RAG retrieval step,
@@ -86,7 +90,7 @@ def lookup_order_status(order_id: str) -> dict:
 def plan_response(user_query: str) -> str:
     """Agent reasoning: decide how to handle the query."""
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         messages=[
             {
                 "role": "system",
@@ -109,7 +113,7 @@ def plan_response(user_query: str) -> str:
 def generate_answer(user_query: str, context: str) -> str:
     """Generate a final answer using the gathered context."""
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         messages=[
             {
                 "role": "system",

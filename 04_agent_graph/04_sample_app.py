@@ -28,14 +28,17 @@ from galileo.openai import openai
 from galileo import log, galileo_context
 
 load_dotenv("../.env")
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
 # Confirm that environment variables are properly mapped
 print(f"Loaded env variables: galileo console: {os.environ.get("GALILEO_CONSOLE_URL")} | Project: {project} | Log Stream: {log_stream}")
 
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
+#client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
 # ── Sample data: mock retrieval corpus ────────────────────────────────────────
 
 KNOWLEDGE_BASE = {
@@ -65,7 +68,7 @@ def retrieve_context(question: str) -> str:
 def synthesize_answer(question: str, context: str) -> str:
     """Call the LLM to generate an answer grounded in the retrieved context."""
     response = client.chat.completions.create(
-        model="gpt-5.2",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         messages=[
             {
                 "role": "system",

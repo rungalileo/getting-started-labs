@@ -26,7 +26,7 @@ from galileo import GalileoMetrics, log
 
 load_dotenv("../.env")
 
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
 # Confirm that environment variables are properly mapped
@@ -100,15 +100,18 @@ print()
 # ---------------------------------------------------------------------------
 # LLM runner — wrapped by Galileo for automatic tracing
 # ---------------------------------------------------------------------------
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
+#client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
 
 @log
 def support_assistant(input: dict) -> str:
     """Answers customer support questions."""
     query = input["input"] if isinstance(input, dict) else input
     response = client.chat.completions.create(
-        model="gpt-5.2",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         messages=[
             {
                 "role": "system",

@@ -31,7 +31,7 @@ from galileo.prompts import create_prompt, get_prompt
 
 load_dotenv("../.env")
 
-project=os.environ.get("GALILEO_PROJECT_NAME")
+project=os.environ.get("GALILEO_PROJECT")
 log_stream=os.environ.get("GALILEO_LOG_STREAM")
 
 # Confirm that environment variables are properly mapped
@@ -121,7 +121,12 @@ print("Experiment 1 complete. View at the link above.\n")
 # ---------------------------------------------------------------------------
 print("--- Experiment 2: Custom Function ---")
 
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+#client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_BASE_URL"),
+)
+
 
 SYSTEM_PROMPT = (
     "You are a concise, helpful customer support assistant. "
@@ -140,7 +145,7 @@ def support_bot(input: dict) -> str:
     """
     query = input["input"] if isinstance(input, dict) else input
     response = client.chat.completions.create(
-        model="gpt-5.2",
+        model=os.environ.get("OPENAI_MODEL_NAME"),
         temperature=0.3,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
