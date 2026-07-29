@@ -58,5 +58,5 @@ if __name__ == "__main__":
         ask("What would be the impact of rising interest rages?")
 
     print("✓ Done — open your Galileo dashboard to see the traces.")
-    print(f"  Project:    {os.environ.get('GALILEO_PROJECT')}")
+    print(f"  Project:    {os.environ.get('GALILEO_PROJECT_NAME')}")
     print(f"  Log Stream: {os.environ.get('GALILEO_LOG_STREAM')}")
